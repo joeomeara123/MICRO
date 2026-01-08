@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BrandLogo } from './BrandLogo';
 
 export interface Task {
   id: string;
@@ -8,22 +9,16 @@ export interface Task {
   description?: string;
   category?: string;
   priority_level?: 'High' | 'Medium' | 'Low';
-  source: 'notion' | 'email' | 'ai_suggestion' | 'manual';
+  source: 'notion' | 'email' | 'ai_suggestion' | 'manual' | 'twitter' | 'slack' | 'newsletter' | 'article';
   due_date?: string;
   owner?: string;
+  brand?: string; // Specific brand for logo (e.g., "Lenny", "Financial Times")
 }
 
 interface TaskCardProps {
   task: Task;
   onPress?: () => void;
 }
-
-const SOURCE_ICONS: Record<Task['source'], keyof typeof Ionicons.glyphMap> = {
-  notion: 'document-text',
-  email: 'mail',
-  ai_suggestion: 'sparkles',
-  manual: 'create',
-};
 
 const PRIORITY_COLORS: Record<string, string> = {
   High: '#FF6B6B',
@@ -36,17 +31,21 @@ export function TaskCard({ task, onPress }: TaskCardProps) {
     ? PRIORITY_COLORS[task.priority_level]
     : '#E0E0E0';
 
+  // Use brand if provided, otherwise fall back to source
+  const logoBrand = task.brand || task.source;
+
   return (
     <Pressable onPress={onPress} style={styles.container}>
-      {/* Header with source icon and priority */}
+      {/* Header with brand logo and priority */}
       <View style={styles.header}>
         <View style={styles.sourceContainer}>
-          <Ionicons
-            name={SOURCE_ICONS[task.source]}
-            size={16}
-            color="#666"
-          />
-          <Text style={styles.sourceText}>{task.source}</Text>
+          <BrandLogo brand={logoBrand} size={28} />
+          <View style={styles.sourceInfo}>
+            <Text style={styles.sourceText}>{task.owner || task.source}</Text>
+            {task.brand && (
+              <Text style={styles.brandText}>{task.brand}</Text>
+            )}
+          </View>
         </View>
         {task.priority_level && (
           <View style={[styles.priorityBadge, { backgroundColor: priorityColor }]}>
@@ -104,12 +103,20 @@ const styles = StyleSheet.create({
   sourceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 10,
+  },
+  sourceInfo: {
+    flexDirection: 'column',
   },
   sourceText: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#666',
-    textTransform: 'capitalize',
+    fontWeight: '500',
+  },
+  brandText: {
+    fontSize: 11,
+    color: '#999',
+    marginTop: 1,
   },
   priorityBadge: {
     paddingHorizontal: 10,

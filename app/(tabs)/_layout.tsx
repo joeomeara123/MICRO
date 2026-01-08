@@ -2,9 +2,6 @@ import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof Ionicons>['name'];
   color: string;
@@ -13,32 +10,43 @@ function TabBarIcon(props: {
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: '#fff',
+        tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.4)',
         headerShown: false,
         tabBarStyle: {
           borderTopWidth: 0,
           elevation: 0,
           shadowOpacity: 0,
-          backgroundColor: colorScheme === 'dark' ? '#000' : '#fff',
+          backgroundColor: '#000',
+          paddingTop: 8,
+          height: 85,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
         },
       }}>
       <Tabs.Screen
         name="index"
         options={{
           title: 'Tasks',
-          tabBarIcon: ({ color }) => <TabBarIcon name="layers-outline" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="checkbox-outline" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="learning"
+        options={{
+          title: 'Learning',
+          tabBarIcon: ({ color }) => <TabBarIcon name="book-outline" color={color} />,
         }}
       />
       <Tabs.Screen
         name="two"
         options={{
-          title: 'Settings',
-          tabBarIcon: ({ color }) => <TabBarIcon name="settings-outline" color={color} />,
+          href: null, // Hide old tab
         }}
       />
     </Tabs>

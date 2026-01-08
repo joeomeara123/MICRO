@@ -1,4 +1,5 @@
-import { StyleSheet, SafeAreaView, StatusBar } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { CardStack } from '@/components/CardStack';
 import { Task } from '@/components/TaskCard';
 
@@ -11,6 +12,8 @@ const SAMPLE_TASKS: Task[] = [
     category: 'Hiring',
     priority_level: 'High',
     source: 'notion',
+    brand: 'Notion',
+    owner: 'Hiring Pipeline',
     due_date: 'Today',
   },
   {
@@ -20,6 +23,8 @@ const SAMPLE_TASKS: Task[] = [
     category: 'Contracts',
     priority_level: 'High',
     source: 'notion',
+    brand: 'Notion',
+    owner: 'Legal Docs',
     due_date: 'Tomorrow',
   },
   {
@@ -29,6 +34,8 @@ const SAMPLE_TASKS: Task[] = [
     category: 'Client',
     priority_level: 'Medium',
     source: 'email',
+    brand: 'Gmail',
+    owner: 'james@acme.com',
     due_date: 'Today',
   },
   {
@@ -38,6 +45,8 @@ const SAMPLE_TASKS: Task[] = [
     category: 'Finance',
     priority_level: 'Medium',
     source: 'notion',
+    brand: 'Notion',
+    owner: 'Finance',
     due_date: 'This week',
   },
   {
@@ -47,41 +56,60 @@ const SAMPLE_TASKS: Task[] = [
     category: 'AI Suggestion',
     priority_level: 'Low',
     source: 'ai_suggestion',
+    owner: 'MICRO AI',
   },
 ];
 
 export default function TaskFeedScreen() {
   const handleSwipeLeft = (task: Task) => {
-    console.log('Dismissed:', task.title);
-    // TODO: Update task status in Notion/Supabase
+    console.log('[Tasks] Dismissed:', task.title);
   };
 
   const handleSwipeRight = (task: Task) => {
-    console.log('Approved:', task.title);
-    // TODO: Trigger agent action and update status
-  };
-
-  const handleCardPress = (task: Task) => {
-    console.log('View details:', task.title);
-    // TODO: Navigate to task detail modal
+    console.log('[Tasks] Approved:', task.title);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <CardStack
-        tasks={SAMPLE_TASKS}
-        onSwipeLeft={handleSwipeLeft}
-        onSwipeRight={handleSwipeRight}
-        onCardPress={handleCardPress}
-      />
-    </SafeAreaView>
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Tasks</Text>
+        <Text style={styles.headerSubtitle}>{SAMPLE_TASKS.length} items to review</Text>
+      </View>
+
+      {/* Card Stack */}
+      <View style={styles.cardContainer}>
+        <CardStack
+          tasks={SAMPLE_TASKS}
+          onSwipeLeft={handleSwipeLeft}
+          onSwipeRight={handleSwipeRight}
+        />
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#000',
+  },
+  header: {
+    paddingTop: 60,
+    paddingHorizontal: 24,
+    paddingBottom: 20,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.5)',
+    marginTop: 4,
+  },
+  cardContainer: {
+    flex: 1,
   },
 });
