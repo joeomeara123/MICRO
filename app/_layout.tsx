@@ -1,5 +1,5 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -8,17 +8,14 @@ import 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { View } from 'react-native';
 
-import { useColorScheme } from '@/components/useColorScheme';
 import { AnimatedSplash } from '@/components/AnimatedSplash';
 
 export {
-  // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from 'expo-router';
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+  initialRouteName: '(auth)',
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -31,14 +28,12 @@ export default function RootLayout() {
   });
   const [showAnimatedSplash, setShowAnimatedSplash] = useState(true);
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
 
   useEffect(() => {
     if (loaded) {
-      // Hide the native splash screen immediately when fonts are loaded
       SplashScreen.hideAsync();
     }
   }, [loaded]);
@@ -61,14 +56,24 @@ interface RootLayoutNavProps {
 }
 
 function RootLayoutNav({ showAnimatedSplash, onSplashComplete }: RootLayoutNavProps) {
-  const colorScheme = useColorScheme();
+  // Force dark theme for consistent look
+  const darkTheme = {
+    ...DarkTheme,
+    colors: {
+      ...DarkTheme.colors,
+      background: '#000',
+      card: '#000',
+    },
+  };
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <View style={{ flex: 1 }}>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <ThemeProvider value={darkTheme}>
+        <View style={{ flex: 1, backgroundColor: '#000' }}>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="sign-in" />
+            <Stack.Screen name="(tabs)" />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
           </Stack>
 
