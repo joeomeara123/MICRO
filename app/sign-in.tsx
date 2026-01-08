@@ -13,6 +13,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const EASE_OUT = Easing.bezier(0.33, 1, 0.68, 1);
 
@@ -92,10 +93,17 @@ export default function SignInScreen() {
     buttonScale.value = withSpring(1, { damping: 15, stiffness: 400 });
   };
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    // For now, just navigate to the main app
-    router.replace('/(tabs)');
+
+    // Check if onboarding is complete
+    const onboardingComplete = await AsyncStorage.getItem('onboarding_complete');
+
+    if (onboardingComplete === 'true') {
+      router.replace('/(tabs)');
+    } else {
+      router.replace('/onboarding');
+    }
   };
 
   return (

@@ -73,6 +73,7 @@ function RootLayoutNav({ showAnimatedSplash, onSplashComplete }: RootLayoutNavPr
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" />
             <Stack.Screen name="sign-in" />
+            <Stack.Screen name="onboarding" />
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
           </Stack>
