@@ -18,8 +18,8 @@ const BRAND_LOGOS: Record<string, string> = {
   // Publications/newsletters
   'every.to': 'https://every.to/favicon.ico',
   'financial times': 'https://www.ft.com/__origami/service/image/v2/images/raw/ftlogo-v1%3Abrand-ft-logo-square-coloured?source=update-logos&format=svg',
-  'first round': 'https://assets-global.website-files.com/5f2b25e86e4c4f1c64a0c70f/5f2b2647b50c3f0d90c5e8e5_fr-favicon.png',
-  'lenny': 'https://substackcdn.com/image/fetch/f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F2c48569f-373c-4d04-96a3-3a8f51e4e02b_256x256.png',
+  'first round': 'https://review.firstround.com/content/images/2024/02/Reviewlogo.png',
+  'lenny': 'https://substack-post-media.s3.amazonaws.com/public/images/4a25905e-c484-4885-80fa-9c2e683e362b_592x592.png',
   'techcrunch': 'https://techcrunch.com/wp-content/uploads/2015/02/cropped-cropped-favicon-gradient.png',
   'the verge': 'https://cdn.vox-cdn.com/uploads/chorus_asset/file/7395367/favicon-64x64.0.png',
 
