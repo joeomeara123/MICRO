@@ -16,6 +16,10 @@ export {
   ErrorBoundary,
 } from 'expo-router';
 
+// Module-level flag to prevent splash from restarting on remount
+// This persists across re-renders and remounts within the same app session
+let splashHasCompleted = false;
+
 export const unstable_settings = {
   initialRouteName: '(auth)',
 };
@@ -28,7 +32,13 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });
-  const [showAnimatedSplash, setShowAnimatedSplash] = useState(true);
+  // Only show splash if it hasn't already started in this session
+  // Set the flag immediately to prevent double-start on early remounts
+  const [showAnimatedSplash, setShowAnimatedSplash] = useState(() => {
+    if (splashHasCompleted) return false;
+    splashHasCompleted = true; // Mark as started immediately
+    return true;
+  });
 
   useEffect(() => {
     if (error) throw error;
@@ -43,8 +53,9 @@ export default function RootLayout() {
   // Backup timeout in case animated splash doesn't complete
   useEffect(() => {
     const timeout = setTimeout(() => {
-      if (showAnimatedSplash) {
+      if (showAnimatedSplash && !splashHasCompleted) {
         console.log('[Splash] Backup timeout - forcing splash complete');
+        splashHasCompleted = true;
         setShowAnimatedSplash(false);
       }
     }, 5000);
@@ -61,6 +72,7 @@ export default function RootLayout() {
         showAnimatedSplash={showAnimatedSplash}
         onSplashComplete={() => {
           console.log('[Splash] onSplashComplete called');
+          splashHasCompleted = true; // Set module-level flag
           setShowAnimatedSplash(false);
         }}
       />

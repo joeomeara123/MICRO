@@ -7,6 +7,9 @@ import { Platform } from 'react-native';
 // Complete any pending auth sessions
 WebBrowser.maybeCompleteAuthSession();
 
+// Track if we've already logged (prevent spam on re-renders)
+let hasLoggedOnce = false;
+
 export function useGoogleAuth() {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,8 +20,12 @@ export function useGoogleAuth() {
     path: 'auth/callback',
   });
 
-  console.log('[GoogleAuth] Platform:', Platform.OS);
-  console.log('[GoogleAuth] Redirect URI:', redirectUri);
+  // Only log once to avoid spam on re-renders
+  if (!hasLoggedOnce) {
+    console.log('[GoogleAuth] Platform:', Platform.OS);
+    console.log('[GoogleAuth] Redirect URI:', redirectUri);
+    hasLoggedOnce = true;
+  }
 
   const signInWithGoogle = async () => {
     try {
