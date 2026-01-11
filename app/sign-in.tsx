@@ -1,11 +1,9 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { router } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  withDelay,
   withSpring,
   interpolate,
   Easing,
@@ -13,13 +11,17 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '@/hooks/useAuth';
 
 const EASE_OUT = Easing.bezier(0.33, 1, 0.68, 1);
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function SignInScreen() {
+  const { signIn, isLoading } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+  const [isSigningIn, setIsSigningIn] = useState(false);
+
   const progress = useSharedValue(0);
   const buttonScale = useSharedValue(1);
 
@@ -95,14 +97,18 @@ export default function SignInScreen() {
 
   const handleSignIn = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setError(null);
+    setIsSigningIn(true);
 
-    // Check if onboarding is complete
-    const onboardingComplete = await AsyncStorage.getItem('onboarding_complete');
-
-    if (onboardingComplete === 'true') {
-      router.replace('/(tabs)');
-    } else {
-      router.replace('/onboarding');
+    try {
+      await signIn();
+      // Navigation is handled by auth state change in _layout.tsx
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Sign in failed';
+      setError(message);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    } finally {
+      setIsSigningIn(false);
     }
   };
 
@@ -126,14 +132,25 @@ export default function SignInScreen() {
       {/* Sign in button */}
       <Animated.View style={[styles.buttonContainer, buttonContainerStyle]}>
         <AnimatedPressable
-          style={[styles.googleButton, buttonStyle]}
+          style={[styles.googleButton, buttonStyle, (isSigningIn || isLoading) && styles.googleButtonDisabled]}
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
           onPress={handleSignIn}
+          disabled={isSigningIn || isLoading}
         >
-          <Ionicons name="logo-google" size={20} color="#000" style={styles.googleIcon} />
-          <Text style={styles.googleButtonText}>Continue with Google</Text>
+          {isSigningIn || isLoading ? (
+            <ActivityIndicator size="small" color="#000" />
+          ) : (
+            <>
+              <Ionicons name="logo-google" size={20} color="#000" style={styles.googleIcon} />
+              <Text style={styles.googleButtonText}>Continue with Google</Text>
+            </>
+          )}
         </AnimatedPressable>
+
+        {error && (
+          <Text style={styles.errorText}>{error}</Text>
+        )}
 
         <Text style={styles.disclaimer}>
           By continuing, you agree to our Terms of Service
@@ -198,6 +215,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#000',
+  },
+  googleButtonDisabled: {
+    opacity: 0.7,
+  },
+  errorText: {
+    marginTop: 16,
+    fontSize: 14,
+    color: '#ff6b6b',
+    textAlign: 'center',
   },
   disclaimer: {
     marginTop: 20,
