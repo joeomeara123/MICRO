@@ -37,7 +37,7 @@
         "Typecheck passes: npx tsc --noEmit"
       ],
       "priority": 2,
-      "passes": false,
+      "passes": true,
       "notes": "Must be created before tables that use these enums. Enums provide type safety at database level."
     },
     {
@@ -58,8 +58,8 @@
         "Typecheck passes: npx tsc --noEmit"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": "Tracks integrations like Google, Notion, Slack. Each user can have one connection per provider."
+      "passes": true,
+      "notes": "Tracks integrations like Google, Notion, Slack. Each user can have one connection per provider. Migration created with all RLS policies and auto-update trigger."
     },
     {
       "id": "US-004",

@@ -11,6 +11,7 @@ Branch: ralph/03-task-data-model
 - Task interface is currently inline in components/TaskCard.tsx (will be moved to types/)
 - Use `npx tsc --noEmit` for typecheck
 - RLS pattern: `auth.uid() = user_id`
+- Reusable `update_updated_at_column()` trigger function defined in connected_apps migration - use it for other tables
 
 ---
 
@@ -43,5 +44,54 @@ PRD 03: Task Data Model
 - `npm install -g supabase` does NOT work - use Homebrew instead
 - Supabase init creates .gitignore with .temp/ already excluded
 - config.toml uses project name from folder (Micro-app)
+
+---
+
+## 2026-01-11 19:05 - US-002: Create Database Enums
+
+**What was implemented:**
+- Created migration file with all 5 PostgreSQL enums
+- integration_provider: google, notion, slack, linear, jira
+- connection_status: active, token_expired, refresh_failed, revoked, disconnected
+- task_source: notion, email, slack, ai_suggestion, manual
+- task_priority: high, medium, low
+- task_status: pending, approved, dismissed, snoozed
+
+**Files changed:**
+- supabase/migrations/20260111000001_create_enums.sql (new)
+
+**Learnings for future iterations:**
+- Migration files are plain SQL with CREATE TYPE syntax
+- Enum values should match what the app UI/logic expects
+- These enums must be created BEFORE any tables that reference them
+
+**Note:** Migration must be applied via Supabase dashboard (US-006) before enums are visible.
+
+---
+
+## 2026-01-11 19:15 - US-003: Create connected_apps Table
+
+**What was implemented:**
+- Created migration file for connected_apps table
+- Table tracks OAuth integrations per user (Google, Notion, Slack, etc.)
+- UUID primary key with auto-generation via gen_random_uuid()
+- Foreign key to auth.users with ON DELETE CASCADE
+- Provider and status columns use enums from US-002
+- Provider account fields for storing OAuth profile info
+- granted_scopes array for OAuth permissions
+- Unique constraint on (user_id, provider) prevents duplicates
+- Auto-update trigger for updated_at column (reusable function)
+- RLS enabled with 4 policies (SELECT/INSERT/UPDATE/DELETE for own rows)
+
+**Files changed:**
+- supabase/migrations/20260111000002_create_connected_apps.sql (new)
+
+**Learnings for future iterations:**
+- The `update_updated_at_column()` function is reusable - other tables can use it
+- RLS pattern uses `auth.uid() = user_id` for USING and `WITH CHECK` clauses
+- UPDATE policy needs both USING (filter existing rows) and WITH CHECK (validate new values)
+- gen_random_uuid() is the PostgreSQL built-in for UUID generation (no extension needed)
+
+**Note:** Migration must be applied via Supabase dashboard (US-006) before table is visible.
 
 ---
