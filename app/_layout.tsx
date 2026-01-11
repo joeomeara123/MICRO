@@ -40,6 +40,17 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
+  // Backup timeout in case animated splash doesn't complete
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (showAnimatedSplash) {
+        console.log('[Splash] Backup timeout - forcing splash complete');
+        setShowAnimatedSplash(false);
+      }
+    }, 5000);
+    return () => clearTimeout(timeout);
+  }, [showAnimatedSplash]);
+
   if (!loaded) {
     return null;
   }
@@ -48,7 +59,10 @@ export default function RootLayout() {
     <AuthProvider>
       <RootLayoutNav
         showAnimatedSplash={showAnimatedSplash}
-        onSplashComplete={() => setShowAnimatedSplash(false)}
+        onSplashComplete={() => {
+          console.log('[Splash] onSplashComplete called');
+          setShowAnimatedSplash(false);
+        }}
       />
     </AuthProvider>
   );
@@ -63,38 +77,41 @@ function RootLayoutNav({ showAnimatedSplash, onSplashComplete }: RootLayoutNavPr
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
-  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
 
   // Handle auth-based routing
   useEffect(() => {
-    if (isLoading || showAnimatedSplash) return;
+    if (isLoading || showAnimatedSplash) {
+      console.log('[Layout] Waiting... isLoading:', isLoading, 'showAnimatedSplash:', showAnimatedSplash);
+      return;
+    }
 
-    const checkRouting = async () => {
-      const inAuthGroup = segments[0] === '(tabs)';
-      const onSignIn = segments[0] === 'sign-in';
-      const onOnboarding = segments[0] === 'onboarding';
+    console.log('[Layout] Checking routing. isAuthenticated:', isAuthenticated, 'segments:', segments);
 
-      if (isAuthenticated) {
-        // User is signed in
-        if (onSignIn) {
-          // Check if onboarding is complete
-          const onboardingComplete = await AsyncStorage.getItem('onboarding_complete');
-          if (onboardingComplete === 'true') {
+    const inAuthGroup = segments[0] === '(tabs)';
+    const onSignIn = segments[0] === 'sign-in';
+    const onOnboarding = segments[0] === 'onboarding';
+
+    if (isAuthenticated) {
+      // User is signed in
+      if (onSignIn) {
+        // Check if onboarding is complete
+        AsyncStorage.getItem('onboarding_complete').then((value) => {
+          if (value === 'true') {
+            console.log('[Layout] Redirecting to tabs');
             router.replace('/(tabs)');
           } else {
+            console.log('[Layout] Redirecting to onboarding');
             router.replace('/onboarding');
           }
-        }
-      } else {
-        // User is not signed in
-        if (inAuthGroup || onOnboarding) {
-          router.replace('/sign-in');
-        }
+        });
       }
-      setIsCheckingOnboarding(false);
-    };
-
-    checkRouting();
+    } else {
+      // User is not signed in
+      if (inAuthGroup || onOnboarding) {
+        console.log('[Layout] Redirecting to sign-in');
+        router.replace('/sign-in');
+      }
+    }
   }, [isAuthenticated, isLoading, segments, showAnimatedSplash]);
 
   // Force dark theme for consistent look
@@ -107,8 +124,8 @@ function RootLayoutNav({ showAnimatedSplash, onSplashComplete }: RootLayoutNavPr
     },
   };
 
-  // Show loading while checking auth
-  if (isLoading || isCheckingOnboarding) {
+  // Show loading only during auth check (after splash completes)
+  if (isLoading && !showAnimatedSplash) {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <View style={{ flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }}>

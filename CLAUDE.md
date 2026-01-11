@@ -39,6 +39,39 @@ Product Brief → PRDs → User Stories → Success Criteria → Build → Test 
 4. **Typecheck always** - Every story ends with "Typecheck passes"
 5. **Device verify** - UI changes require "Verify on device via Expo Go"
 
+### PRD Implementation Workflow (Mandatory)
+
+When starting any PRD implementation, **ALWAYS** follow these steps:
+
+#### Step 1: PRD Intake
+1. Read the PRD JSON: `docs/prd/XX-name.json`
+2. Display ALL user stories with acceptance criteria to user
+3. Confirm: "Ready to start US-001: [Title]?"
+
+#### Step 2: Story-by-Story Implementation
+For each story (US-001 → US-002 → etc.):
+1. Show acceptance criteria as checklist
+2. Implement the feature
+3. Run typecheck: `npx tsc --noEmit`
+4. Ask user for verification (screenshot or description)
+5. Update JSON with actual pass/fail
+6. Move to next story
+
+#### Step 3: Verification Checklist Per Story
+- [ ] Criteria shown to user before implementation
+- [ ] Implementation complete
+- [ ] Typecheck passes
+- [ ] User verified on device (screenshot)
+- [ ] JSON updated with actual status
+
+#### Step 4: PRD Completion
+- All stories verified
+- JSON reflects actual test results
+- CLAUDE.md PRD status updated
+- Commit with PRD reference in message
+
+**Note (PRD 02 Retrospective)**: This workflow was added after PRD 02 implementation. PRD 02 was completed successfully but without story-by-story visibility. Going forward, all PRDs follow this structured workflow.
+
 ---
 
 ## Current Phase

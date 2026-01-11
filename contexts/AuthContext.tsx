@@ -21,23 +21,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Listen for auth state changes
   useEffect(() => {
+    let mounted = true;
+
+    // Timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      if (mounted && isLoading) {
+        console.log('[Auth] Session check timed out, proceeding as unauthenticated');
+        setIsLoading(false);
+      }
+    }, 5000);
+
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    });
+    supabase.auth.getSession()
+      .then(({ data: { session }, error }) => {
+        if (!mounted) return;
+        if (error) {
+          console.log('[Auth] getSession error:', error.message);
+        }
+        console.log('[Auth] Session loaded:', session ? 'authenticated' : 'no session');
+        setSession(session);
+        setUser(session?.user ?? null);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        if (!mounted) return;
+        console.log('[Auth] getSession failed:', err);
+        setIsLoading(false);
+      });
 
     // Subscribe to auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
+      console.log('[Auth] Auth state changed:', _event);
       setSession(session);
       setUser(session?.user ?? null);
       setIsLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      clearTimeout(timeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = useCallback(async () => {

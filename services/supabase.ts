@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
@@ -10,9 +11,19 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
+// Check if running in a browser/native environment (not SSR)
+const isClient = typeof window !== 'undefined' || Platform.OS !== 'web';
+
+// No-op storage for SSR
+const noopStorage = {
+  getItem: () => Promise.resolve(null),
+  setItem: () => Promise.resolve(),
+  removeItem: () => Promise.resolve(),
+};
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    storage: AsyncStorage,
+    storage: isClient ? AsyncStorage : noopStorage,
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
