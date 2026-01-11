@@ -28,6 +28,18 @@ export type TaskPriority = 'high' | 'medium' | 'low';
 export type TaskStatus = 'pending' | 'approved' | 'dismissed' | 'snoozed';
 
 // ============================================================
+// JSON type for JSONB columns
+// ============================================================
+
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
+
+// ============================================================
 // Table Types
 // ============================================================
 
@@ -130,7 +142,7 @@ export interface TaskRow {
   priority_level: TaskPriority | null;
   status: TaskStatus;
   due_date: string | null;
-  metadata: Record<string, unknown>;
+  metadata: Json;
   snoozed_until: string | null;
   actioned_at: string | null;
   deleted_at: string | null;
@@ -149,7 +161,7 @@ export interface TaskInsert {
   priority_level?: TaskPriority | null;
   status?: TaskStatus;
   due_date?: string | null;
-  metadata?: Record<string, unknown>;
+  metadata?: Json;
   snoozed_until?: string | null;
   actioned_at?: string | null;
   deleted_at?: string | null;
@@ -168,7 +180,7 @@ export interface TaskUpdate {
   priority_level?: TaskPriority | null;
   status?: TaskStatus;
   due_date?: string | null;
-  metadata?: Record<string, unknown>;
+  metadata?: Json;
   snoozed_until?: string | null;
   actioned_at?: string | null;
   deleted_at?: string | null;
@@ -187,17 +199,50 @@ export interface Database {
         Row: ConnectedAppRow;
         Insert: ConnectedAppInsert;
         Update: ConnectedAppUpdate;
+        Relationships: [
+          {
+            foreignKeyName: 'connected_apps_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          }
+        ];
       };
       oauth_tokens: {
         Row: OAuthTokenRow;
         Insert: OAuthTokenInsert;
         Update: OAuthTokenUpdate;
+        Relationships: [
+          {
+            foreignKeyName: 'oauth_tokens_connected_app_id_fkey';
+            columns: ['connected_app_id'];
+            isOneToOne: false;
+            referencedRelation: 'connected_apps';
+            referencedColumns: ['id'];
+          }
+        ];
       };
       tasks: {
         Row: TaskRow;
         Insert: TaskInsert;
         Update: TaskUpdate;
+        Relationships: [
+          {
+            foreignKeyName: 'tasks_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          }
+        ];
       };
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      [_ in never]: never;
     };
     Enums: {
       integration_provider: IntegrationProvider;
@@ -205,6 +250,9 @@ export interface Database {
       task_source: TaskSource;
       task_priority: TaskPriority;
       task_status: TaskStatus;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
     };
   };
 }

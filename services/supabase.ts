@@ -21,6 +21,15 @@ const noopStorage = {
   removeItem: () => Promise.resolve(),
 };
 
+/**
+ * Supabase client instance.
+ *
+ * Note: The client is currently untyped. After applying migrations (US-006),
+ * regenerate types with `supabase gen types typescript --linked > types/database.ts`
+ * and add the Database generic: createClient<Database>(...)
+ *
+ * @see types/database.ts for manual type definitions
+ */
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: isClient ? AsyncStorage : noopStorage,
@@ -29,31 +38,3 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: false,
   },
 });
-
-// Type placeholder - will be generated from Supabase later
-export type Database = {
-  public: {
-    Tables: {
-      users: {
-        Row: {
-          id: string;
-          email: string;
-          display_name: string | null;
-          avatar_url: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id: string;
-          email: string;
-          display_name?: string | null;
-          avatar_url?: string | null;
-        };
-        Update: {
-          display_name?: string | null;
-          avatar_url?: string | null;
-        };
-      };
-    };
-  };
-};
