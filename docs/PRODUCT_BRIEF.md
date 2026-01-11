@@ -168,13 +168,51 @@ Toggle between modes via bottom tab or swipe gesture.
 
 ---
 
-## Authentication
+## Authentication & Integrations
 
-**Google Sign-In Only** (MVP)
-- Simple OAuth flow
-- Ties directly to Gmail for email integration
-- Familiar to users
-- Supabase handles session management
+**See full details**: `docs/INTEGRATION_ARCHITECTURE.md`
+
+### How Users Connect
+
+```
+1. SIGN IN WITH GOOGLE
+   └── Creates account + grants Gmail access in one step
+       (Single OAuth with extended scopes)
+
+2. SETTINGS → CONNECTED APPS
+   ┌─────────────────────────────────────────────┐
+   │  ✅ Google (Gmail)     joe@palindrom.ai     │
+   │  ⬜ Notion              [Connect]            │
+   │  ⬜ Slack               [Connect]            │
+   └─────────────────────────────────────────────┘
+
+3. TAP TO CONNECT EACH SERVICE
+   └── Opens OAuth in browser → User authorizes → Token stored
+```
+
+### Key Architecture Decisions
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| Integration approach | Build each OAuth directly | Full control, no third-party dependency |
+| Gmail access | Included with Google Sign-In | One sign-in flow, better UX |
+| Token storage | Encrypted in Supabase | Tokens never touch mobile app |
+| API calls | Proxied via Edge Functions | Security + automatic token refresh |
+
+### Security Model
+
+```
+Mobile App ───"fetch emails"───▶ Supabase Edge Function
+                                      │
+                                      ├── Get encrypted token
+                                      ├── Decrypt token
+                                      ├── Call Gmail API
+                                      └── Return data (not token)
+                                           │
+Mobile App ◀───"here are emails"──────────┘
+```
+
+**Tokens never leave the server** - even if app is reverse-engineered, tokens are safe.
 
 ---
 
@@ -271,9 +309,9 @@ The MVP will be built through these PRDs (in priority order):
 
 ## Open Questions
 
-1. **Email integration approach**: Gmail API vs IMAP vs third-party (Nylas)?
+1. ~~**Email integration approach**: Gmail API vs IMAP vs third-party?~~ → **Gmail API** (via Google OAuth)
 2. **AI provider for drafts**: OpenAI vs Claude vs local model?
-3. **Slack app vs OAuth**: Build Slack app or use OAuth for link access?
+3. ~~**Slack app vs OAuth**: Build Slack app or use OAuth?~~ → **OAuth** (user-level access)
 4. **Content curation**: Manual add vs AI recommendations vs RSS?
 
 ---

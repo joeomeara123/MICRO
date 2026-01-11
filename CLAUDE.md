@@ -26,6 +26,7 @@ Product Brief → PRDs → User Stories → Success Criteria → Build → Test 
 | File | Purpose |
 |------|---------|
 | `docs/PRODUCT_BRIEF.md` | Overall product vision and scope |
+| `docs/INTEGRATION_ARCHITECTURE.md` | How OAuth and integrations work |
 | `docs/prd/*.md` | Individual PRDs with user stories |
 | `docs/prd/*.json` | PRDs converted to executable format |
 | `progress.txt` | Append-only log of learnings |
@@ -70,6 +71,7 @@ Product Brief → PRDs → User Stories → Success Criteria → Build → Test 
 - [x] TypeScript compiling successfully
 - [x] Product Brief created
 - [x] Ralph workflow established
+- [x] Integration architecture designed (OAuth, token storage, services layer)
 
 ## Tech Stack
 
@@ -106,10 +108,19 @@ micro-app/
 │   ├── SwipeableCard.tsx         # Core swipe component
 │   ├── TaskCard.tsx              # Task card UI
 │   └── CardStack.tsx             # Stack of cards
-├── services/
+├── services/                     # (to be created)
 │   ├── supabase.ts               # Supabase client
-│   ├── notion.ts                 # Notion API
-│   └── notifications.ts          # Push notifications
+│   ├── auth/
+│   │   ├── google-auth.ts        # Google OAuth + Gmail
+│   │   └── session.ts            # Session management
+│   ├── integrations/
+│   │   ├── base-integration.ts   # Abstract base class
+│   │   ├── notion.ts             # Notion OAuth
+│   │   └── slack.ts              # Slack OAuth
+│   └── api/
+│       ├── notion-client.ts      # Notion API
+│       ├── gmail-client.ts       # Gmail API
+│       └── slack-client.ts       # Slack API
 ├── hooks/
 │   ├── useAuth.ts                # Auth state
 │   └── useTasks.ts               # Tasks data
@@ -123,13 +134,15 @@ micro-app/
 
 1. **Expo over native Swift** - Faster iteration, vibe coding friendly, can test on device via Expo Go
 2. **Supabase over Firebase** - PostgreSQL, better DX, open source
-3. **Google Sign-In** - User preference, good Gmail integration later
+3. **Google Sign-In + Gmail** - Single OAuth grants auth + Gmail access (extended scopes)
 4. **Polymorphic task cards** - Each task type defines its own swipe actions (not binary approve/dismiss)
-5. **Card states** - Initial → Expanded (tap) → Action (swipe)
+5. **Card states** - Initial → Expanded (tap) → AI Assist → Action
 6. **Learning Mode in MVP** - Curated content alongside tasks from day one
 7. **All integrations MVP** - Notion + Email + Slack (not incremental)
-8. **TypeScript + ESLint for QA** - No complex test setup for MVP, fast iteration
-9. **Ralph workflow** - PRD-driven development with testable success criteria
+8. **Build OAuth directly** - No third-party platform (Nango/Merge), full control
+9. **Tokens server-side only** - Encrypted in Supabase, accessed via Edge Functions
+10. **TypeScript + ESLint for QA** - No complex test setup for MVP, fast iteration
+11. **Ralph workflow** - PRD-driven development with testable success criteria
 
 ## Notion Database Fields (User's Existing)
 

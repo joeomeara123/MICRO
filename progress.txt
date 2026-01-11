@@ -71,3 +71,57 @@
 - progress.txt (this entry)
 
 ---
+
+## 2026-01-11 | Integration Architecture Designed
+
+### Summary
+- Designed complete OAuth integration architecture
+- Answered key questions about how users connect accounts
+- Created security model for token storage
+
+### Key Decisions
+1. **Build OAuth directly** - Not using Nango/Merge, full control over each integration
+2. **Gmail with Google Sign-In** - Single OAuth flow grants both auth + Gmail access
+3. **Tokens server-side only** - Encrypted in Supabase, never touch mobile app
+4. **API calls via Edge Functions** - Automatic token refresh, security
+
+### User Flow
+```
+1. Sign in with Google → Creates account + Gmail access
+2. Settings → Connected Apps → Connect Notion/Slack
+3. Each service OAuth opens in browser → Authorize → Token stored
+4. App pulls personalized data from connected services
+```
+
+### Database Schema
+- `users` - Core identity
+- `connected_apps` - Which services connected (provider, status, scopes)
+- `oauth_tokens` - Encrypted tokens (RLS: client cannot read)
+
+### Services Layer Architecture
+```
+services/
+├── auth/google-auth.ts       # Google OAuth + Gmail scopes
+├── integrations/             # OAuth flows per provider
+│   ├── base-integration.ts   # Abstract pattern
+│   ├── notion.ts
+│   └── slack.ts
+└── api/                      # API clients
+    ├── notion-client.ts
+    ├── gmail-client.ts
+    └── slack-client.ts
+```
+
+### Security Pattern
+- Tokens encrypted with pgcrypto (AES-256)
+- Encryption key in Supabase Vault
+- All API calls proxy through Edge Functions
+- Client never sees raw tokens
+
+### Files Created
+- docs/INTEGRATION_ARCHITECTURE.md (new)
+- docs/PRODUCT_BRIEF.md (updated with auth section)
+- CLAUDE.md (updated decisions and structure)
+- progress.txt (this entry)
+
+---
