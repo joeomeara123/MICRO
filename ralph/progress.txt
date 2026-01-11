@@ -242,3 +242,50 @@ supabase db push
 - Import task service via: `import { fetchUserTasks, updateTaskStatus } from '@/services/tasks'`
 
 ---
+
+## 2026-01-11 20:05 - US-010: Connect Feed to Database with Sample Fallback
+
+**What was implemented:**
+- Feed screen imports fetchUserTasks and updateTaskStatus from task service
+- useAuth hook provides user ID for database queries
+- useEffect fetches tasks when user becomes available
+- Loading state with ActivityIndicator while fetching
+- Sample fallback when database is empty or user not authenticated
+- Error state with retry button and "Use Sample Data" option
+- handleSwipeLeft calls updateTaskStatus(taskId, 'dismissed')
+- handleSwipeRight calls updateTaskStatus(taskId, 'approved')
+- Console logging confirms all database operations
+- Header shows "(Sample)" indicator when using fallback data
+
+**Files changed:**
+- app/(tabs)/index.tsx (modified) - Connected to task service with states
+
+**Learnings for future iterations:**
+- taskToCardTask() converts database Task to UI CardTask format
+- usingSampleData flag prevents unnecessary database calls for sample tasks
+- useCallback for loadTasks prevents re-creation on each render
+- Graceful degradation: error → sample fallback maintains app usability
+
+---
+
+## PRD 03 Summary
+
+**Completed Stories:** 8 of 10 (80%)
+- US-001: Supabase Local Development Setup ✅
+- US-002: Database Enums ✅
+- US-003: connected_apps Table ✅
+- US-004: oauth_tokens Table ✅
+- US-005: tasks Table ✅
+- US-006: Apply Migrations (BLOCKED - requires manual action)
+- US-007: Generate TypeScript Types (BLOCKED - requires US-006)
+- US-008: Task TypeScript Interface ✅
+- US-009: Task Service Layer ✅
+- US-010: Connect Feed to Database ✅
+
+**Remaining work:**
+1. US-006: Apply migrations via Supabase dashboard (manual step)
+2. US-007: Run `supabase gen types typescript` after migrations applied
+
+**Next PRD:** 04-Notion-Sync (after US-006 and US-007 complete)
+
+---
