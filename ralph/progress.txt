@@ -1,0 +1,47 @@
+# Ralph Progress Log
+Started: January 11, 2026
+Branch: ralph/03-task-data-model
+
+## Codebase Patterns
+
+- Supabase client is in services/supabase.ts
+- Supabase CLI must be installed via Homebrew (`brew install supabase/tap/supabase`), not npm global
+- Migrations go in supabase/migrations/ with timestamp prefix (YYYYMMDDHHMMSS_description.sql)
+- Auth context is in contexts/AuthContext.tsx
+- Task interface is currently inline in components/TaskCard.tsx (will be moved to types/)
+- Use `npx tsc --noEmit` for typecheck
+- RLS pattern: `auth.uid() = user_id`
+
+---
+
+## Pre-Implementation Notes
+
+PRD 03: Task Data Model
+- 10 user stories to complete
+- Creates: connected_apps, oauth_tokens, tasks tables
+- Generates TypeScript types from schema
+- Connects feed to real database
+
+---
+
+## 2026-01-11 18:57 - US-001: Create Supabase Local Development Setup
+
+**What was implemented:**
+- Installed Supabase CLI v2.67.1 via Homebrew
+- Initialized Supabase with `supabase init`
+- Created migrations/ folder for SQL migrations
+- Added README.md with migration workflow documentation
+
+**Files changed:**
+- supabase/ (new folder)
+- supabase/config.toml (auto-generated)
+- supabase/.gitignore (auto-generated with .temp/ exclusion)
+- supabase/README.md (created)
+- supabase/migrations/ (created)
+
+**Learnings for future iterations:**
+- `npm install -g supabase` does NOT work - use Homebrew instead
+- Supabase init creates .gitignore with .temp/ already excluded
+- config.toml uses project name from folder (Micro-app)
+
+---
