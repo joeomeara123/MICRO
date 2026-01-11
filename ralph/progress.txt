@@ -12,6 +12,7 @@ Branch: ralph/03-task-data-model
 - Use `npx tsc --noEmit` for typecheck
 - RLS pattern: `auth.uid() = user_id`
 - Reusable `update_updated_at_column()` trigger function defined in connected_apps migration - use it for other tables
+- Server-side-only tables: enable RLS with NO policies = clients cannot access, only Edge Functions with service_role key can
 
 ---
 
@@ -91,6 +92,31 @@ PRD 03: Task Data Model
 - RLS pattern uses `auth.uid() = user_id` for USING and `WITH CHECK` clauses
 - UPDATE policy needs both USING (filter existing rows) and WITH CHECK (validate new values)
 - gen_random_uuid() is the PostgreSQL built-in for UUID generation (no extension needed)
+
+**Note:** Migration must be applied via Supabase dashboard (US-006) before table is visible.
+
+---
+
+## 2026-01-11 19:25 - US-004: Create oauth_tokens Table (Server-Side Only)
+
+**What was implemented:**
+- Created migration file for oauth_tokens table
+- Table stores OAuth access and refresh tokens securely
+- UUID primary key with auto-generation
+- Foreign key to connected_apps with ON DELETE CASCADE
+- Index on connected_app_id for fast lookups
+- Reuses existing update_updated_at_column() trigger function
+- RLS enabled with NO policies (critical security feature)
+- Only Supabase Edge Functions with service_role key can access
+
+**Files changed:**
+- supabase/migrations/20260111000003_create_oauth_tokens.sql (new)
+
+**Learnings for future iterations:**
+- RLS enabled + no policies = table is completely inaccessible from client
+- This pattern is used for any server-side-only data (tokens, secrets, etc.)
+- The update_updated_at_column() function is already defined in connected_apps migration - just reference it
+- Comments in SQL help document security decisions for future developers
 
 **Note:** Migration must be applied via Supabase dashboard (US-006) before table is visible.
 

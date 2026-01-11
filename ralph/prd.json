@@ -79,8 +79,8 @@
         "Typecheck passes: npx tsc --noEmit"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": "CRITICAL SECURITY: No RLS policies = no client access. Only Edge Functions with service_role key can read/write."
+      "passes": true,
+      "notes": "CRITICAL SECURITY: No RLS policies = no client access. Only Edge Functions with service_role key can read/write. Migration created with cascading foreign key to connected_apps, index for fast lookups, and reuses update_updated_at_column() trigger."
     },
     {
       "id": "US-005",
