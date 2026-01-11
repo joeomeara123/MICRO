@@ -4,21 +4,21 @@
  * Provides type-safe Task interface with source-specific metadata.
  * Uses discriminated unions to type the JSONB metadata column based on source.
  *
- * @see types/database.ts for base database types
+ * @see types/database.ts for generated database types
  * @see supabase/migrations/20260111000004_create_tasks.sql for schema
  */
 
-import {
-  TaskRow,
-  TaskInsert,
-  TaskUpdate,
-  TaskSource,
-  TaskStatus,
-  TaskPriority,
-} from './database';
+import type { Database, Tables, TablesInsert, TablesUpdate } from './database';
 
-// Re-export base types for convenience
-export { TaskRow, TaskInsert, TaskUpdate, TaskSource, TaskStatus, TaskPriority };
+// Database row types
+export type TaskRow = Tables<'tasks'>;
+export type TaskInsert = TablesInsert<'tasks'>;
+export type TaskUpdate = TablesUpdate<'tasks'>;
+
+// Enum types from database
+export type TaskSource = Database['public']['Enums']['task_source'];
+export type TaskStatus = Database['public']['Enums']['task_status'];
+export type TaskPriority = Database['public']['Enums']['task_priority'];
 
 // ============================================================
 // Source-Specific Metadata Types

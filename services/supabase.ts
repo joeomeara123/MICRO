@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
+import type { Database } from '@/types/database';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
@@ -22,15 +23,12 @@ const noopStorage = {
 };
 
 /**
- * Supabase client instance.
+ * Typed Supabase client instance.
+ * Types are generated from the database schema.
  *
- * Note: The client is currently untyped. After applying migrations (US-006),
- * regenerate types with `supabase gen types typescript --linked > types/database.ts`
- * and add the Database generic: createClient<Database>(...)
- *
- * @see types/database.ts for manual type definitions
+ * @see types/database.ts for generated type definitions
  */
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: isClient ? AsyncStorage : noopStorage,
     autoRefreshToken: true,
@@ -38,3 +36,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: false,
   },
 });
+
+// Re-export Database type for convenience
+export type { Database };
