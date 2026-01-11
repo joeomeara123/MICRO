@@ -16,7 +16,7 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
+      "passes": true,
       "notes": "Manual step - requires creating project at supabase.com"
     },
     {
@@ -33,7 +33,7 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
+      "passes": true,
       "notes": "Manual step - requires Google Cloud Console access"
     },
     {
@@ -49,8 +49,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented in services/supabase.ts"
     },
     {
       "id": "US-004",
@@ -65,8 +65,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented in contexts/AuthContext.tsx and hooks/useAuth.ts"
     },
     {
       "id": "US-005",
@@ -84,8 +84,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": "Core authentication logic"
+      "passes": true,
+      "notes": "Implemented in services/auth/google-auth.ts. Device verification pending user credentials."
     },
     {
       "id": "US-006",
@@ -100,8 +100,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented in app/sign-in.tsx. Uses useAuth hook from context."
     },
     {
       "id": "US-007",
@@ -118,8 +118,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented in app/_layout.tsx with RootLayoutNav component handling auth routing."
     },
     {
       "id": "US-008",
@@ -134,8 +134,8 @@
         "Typecheck passes"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented in app/(tabs)/settings.tsx with confirmation dialog and haptic feedback."
     }
   ]
 }

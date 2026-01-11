@@ -49,8 +49,8 @@ Product Brief → PRDs → User Stories → Success Criteria → Build → Test 
 | # | PRD | Status | Description |
 |---|-----|--------|-------------|
 | 01 | Core Swipe | ✅ Done | Gesture handling, animations, haptics |
-| 02 | Authentication | 🔲 Next | Google Sign-In + Supabase session |
-| 03 | Task Data Model | 🔲 Pending | Supabase schema + polymorphic types |
+| 02 | Authentication | ✅ Done | Google Sign-In + Supabase session |
+| 03 | Task Data Model | 🔲 Next | Supabase schema + polymorphic types |
 | 04 | Notion Sync | 🔲 Pending | Pull tasks, update status |
 | 05 | Card UI System | 🔲 Pending | Swipe cards + Expanded view + AI assist UI |
 | 06 | Gmail Integration | 🔲 Pending | Read emails, AI drafts, send replies |
@@ -72,6 +72,10 @@ Product Brief → PRDs → User Stories → Success Criteria → Build → Test 
 - [x] Product Brief created
 - [x] Ralph workflow established
 - [x] Integration architecture designed (OAuth, token storage, services layer)
+- [x] Google Sign-In with Supabase (services/supabase.ts, services/auth/google-auth.ts)
+- [x] Auth Context + useAuth hook (contexts/AuthContext.tsx, hooks/useAuth.ts)
+- [x] Protected routes with onboarding detection (app/_layout.tsx)
+- [x] Settings screen with sign out (app/(tabs)/settings.tsx)
 
 ## Tech Stack
 

@@ -125,3 +125,85 @@ services/
 - progress.txt (this entry)
 
 ---
+
+## 2026-01-11 | PRD 02: Authentication Implemented
+
+### Summary
+- Implemented complete Google Sign-In flow with Supabase
+- Created auth context and hook for app-wide state management
+- Built protected routes with onboarding detection
+- Added Settings screen with sign out functionality
+
+### User Stories Completed (8/8)
+| ID | Title | Key Implementation |
+|----|-------|-------------------|
+| US-001 | Supabase Project | Manual setup - project created |
+| US-002 | Google OAuth Credentials | Manual setup - iOS + Web client IDs |
+| US-003 | Supabase Client | `services/supabase.ts` with AsyncStorage |
+| US-004 | Auth Context + Hook | `contexts/AuthContext.tsx`, `hooks/useAuth.ts` |
+| US-005 | Google Sign-In Flow | `services/auth/google-auth.ts` with Gmail scopes |
+| US-006 | Sign-In Screen | Updated `app/sign-in.tsx` with real auth |
+| US-007 | Protected Routes | `app/_layout.tsx` with auth routing |
+| US-008 | Sign Out | `app/(tabs)/settings.tsx` with confirmation |
+
+### Architecture Patterns
+
+**Auth Context Pattern**
+```typescript
+// AuthContext provides: user, session, isLoading, isAuthenticated, signIn, signOut
+// Uses Supabase onAuthStateChange for reactive updates
+// Loading state true until initial session check completes
+```
+
+**Google OAuth with Gmail Scopes**
+```typescript
+const GOOGLE_SCOPES = [
+  'openid', 'email', 'profile',  // Auth
+  'gmail.readonly', 'gmail.send', 'gmail.modify'  // Gmail access
+];
+// Requests offline access for refresh token
+// Signs in to Supabase with signInWithIdToken
+```
+
+**Protected Route Logic**
+```
+Auth State Check:
+├── isLoading → Show loading spinner
+├── !isAuthenticated → Redirect to /sign-in
+└── isAuthenticated:
+    ├── onboarding_complete === 'true' → /(tabs)
+    └── else → /onboarding
+```
+
+### Key Implementation Decisions
+1. **Single hook pattern** - `useAuth()` wraps context for convenience
+2. **State-driven navigation** - Auth state changes trigger routes, not manual redirects
+3. **Confirmation dialog** - Sign out requires user confirmation with haptic feedback
+4. **Onboarding flag** - AsyncStorage `onboarding_complete` determines post-login destination
+
+### Files Created/Modified
+- `services/supabase.ts` (new)
+- `types/auth.ts` (new)
+- `services/auth/google-auth.ts` (new)
+- `contexts/AuthContext.tsx` (new)
+- `hooks/useAuth.ts` (new)
+- `app/sign-in.tsx` (updated)
+- `app/_layout.tsx` (updated)
+- `app/(tabs)/settings.tsx` (new)
+- `app/(tabs)/_layout.tsx` (added settings tab)
+- `.env.example` (new)
+- `docs/prd/02-authentication.json` (all stories pass)
+
+### Dependencies Added
+- `@supabase/supabase-js`
+- `expo-auth-session`
+- `expo-crypto`
+- `expo-web-browser`
+- `@react-native-async-storage/async-storage`
+
+### Next Steps
+1. User fills in `.env.local` with actual credentials
+2. Device verification via Expo Go
+3. PRD 03: Task Data Model
+
+---
