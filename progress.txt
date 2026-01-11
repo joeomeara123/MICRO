@@ -1,0 +1,31 @@
+# Micro App - Progress Log
+# Append-only log of discoveries, patterns, and learnings across development iterations
+
+---
+
+## 2026-01-11 | Product Brief Created
+
+### Summary
+- Created Product Brief defining Micro's vision and MVP scope
+- Established polymorphic task card pattern (context-dependent swipe actions)
+- Defined 7 PRDs for MVP build-out
+- Set up Ralph-style workflow with docs/prd/ structure
+
+### Key Decisions
+1. **Target**: Palindrom team (internal), personal daily usage as success metric
+2. **Integrations**: Notion + Email + Slack (all three for MVP)
+3. **Auth**: Google Sign-In only
+4. **Polish level**: Polished animations (haptics, smooth transitions)
+5. **Learning Mode**: Included in MVP
+
+### Patterns Established
+- Tasks are polymorphic - each type defines its own swipe semantics
+- Cards have intermediate states (initial → expanded → action)
+- Two modes: Tasks Mode + Learning Mode
+
+### Files Changed
+- docs/PRODUCT_BRIEF.md (created)
+- docs/prd/ (directory created)
+- progress.txt (created)
+
+---

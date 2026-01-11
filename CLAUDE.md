@@ -8,11 +8,52 @@ This file provides context for Claude Code when working on this project.
 
 **Vision**: Two modes:
 1. **Tasks Mode** - Actionable micro-tasks from Notion, email, AI suggestions
-2. **Learning Mode** (Phase 3) - Curated content from X/Twitter, team Slack links
+2. **Learning Mode** - Curated content from X/Twitter, team Slack links
+
+**Full Product Brief**: See `docs/PRODUCT_BRIEF.md`
+
+---
+
+## Development Methodology: Ralph Workflow
+
+We use the **Ralph Wiggum approach** for structured, testable development:
+
+```
+Product Brief → PRDs → User Stories → Success Criteria → Build → Test → Merge
+```
+
+### Key Files
+| File | Purpose |
+|------|---------|
+| `docs/PRODUCT_BRIEF.md` | Overall product vision and scope |
+| `docs/prd/*.md` | Individual PRDs with user stories |
+| `docs/prd/*.json` | PRDs converted to executable format |
+| `progress.txt` | Append-only log of learnings |
+| `CLAUDE.md` | This file - patterns and context |
+
+### PRD Execution Rules
+1. **Atomic stories** - Each must fit in one context window
+2. **Dependency order** - Schema → Backend → UI
+3. **Verifiable criteria** - No vague "works correctly"
+4. **Typecheck always** - Every story ends with "Typecheck passes"
+5. **Device verify** - UI changes require "Verify on device via Expo Go"
+
+---
 
 ## Current Phase
 
-**Phase 1: MVP** - Core task swiping with Notion integration
+**Phase 1: MVP** - Core task swiping with integrations
+
+### PRD Backlog
+| # | PRD | Status | Description |
+|---|-----|--------|-------------|
+| 01 | Core Swipe | ✅ Done | Gesture handling, animations, haptics |
+| 02 | Authentication | 🔲 Next | Google Sign-In + Supabase session |
+| 03 | Task Data Model | 🔲 Pending | Supabase schema + types |
+| 04 | Notion Sync | 🔲 Pending | Pull tasks, update status |
+| 05 | Task Cards | 🔲 Pending | Polymorphic card UI + actions |
+| 06 | Learning Mode | 🔲 Pending | Content cards + mode toggle |
+| 07 | Polish | 🔲 Pending | Splash, transitions, refinements |
 
 ### Completed
 - [x] Project planning and architecture design
@@ -24,13 +65,8 @@ This file provides context for Claude Code when working on this project.
 - [x] CardStack component managing card stack
 - [x] Task feed UI with sample data
 - [x] TypeScript compiling successfully
-
-### Next Up
-- [ ] Test on device via Expo Go
-- [ ] Google Sign-In authentication
-- [ ] Supabase backend setup
-- [ ] Notion integration
-- [ ] Animated splash screen with Lottie
+- [x] Product Brief created
+- [x] Ralph workflow established
 
 ## Tech Stack
 
@@ -48,6 +84,12 @@ This file provides context for Claude Code when working on this project.
 
 ```
 micro-app/
+├── docs/                         # Ralph workflow documents
+│   ├── PRODUCT_BRIEF.md          # Overall product vision
+│   └── prd/                      # PRDs (markdown + JSON)
+│       ├── 01-core-swipe.md
+│       ├── 02-authentication.md
+│       └── ...
 ├── app/                          # Expo Router (file-based routing)
 │   ├── _layout.tsx               # Root layout with auth check
 │   ├── index.tsx                 # Entry → redirects to auth or feed
@@ -70,6 +112,7 @@ micro-app/
 │   └── useTasks.ts               # Tasks data
 ├── types/
 │   └── index.ts                  # TypeScript types
+├── progress.txt                  # Append-only learnings log
 └── CLAUDE.md                     # This file
 ```
 
@@ -78,9 +121,12 @@ micro-app/
 1. **Expo over native Swift** - Faster iteration, vibe coding friendly, can test on device via Expo Go
 2. **Supabase over Firebase** - PostgreSQL, better DX, open source
 3. **Google Sign-In** - User preference, good Gmail integration later
-4. **Binary swipes for MVP** - Right = approve, Left = dismiss. Multi-action swipes in Phase 2
-5. **Minimal card UI** - Title + source icon + priority. Details on tap.
-6. **TypeScript + ESLint for QA** - No complex test setup for MVP, fast iteration
+4. **Polymorphic task cards** - Each task type defines its own swipe actions (not binary approve/dismiss)
+5. **Card states** - Initial → Expanded (tap) → Action (swipe)
+6. **Learning Mode in MVP** - Curated content alongside tasks from day one
+7. **All integrations MVP** - Notion + Email + Slack (not incremental)
+8. **TypeScript + ESLint for QA** - No complex test setup for MVP, fast iteration
+9. **Ralph workflow** - PRD-driven development with testable success criteria
 
 ## Notion Database Fields (User's Existing)
 
