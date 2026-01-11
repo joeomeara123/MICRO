@@ -29,3 +29,45 @@
 - progress.txt (created)
 
 ---
+
+## 2026-01-11 | Interaction Complexity Matching
+
+### Summary
+- Refined UX model: swipe for binary, tap+expand+AI for complex tasks
+- Added Gmail and Slack integration to MVP scope
+- Expanded PRD list from 7 to 10 to cover new features
+
+### Key Pattern: Interaction Complexity Matching
+| Interaction | Task Type | Example |
+|-------------|-----------|---------|
+| **Swipe** | Binary (yes/no) | Approve contract, dismiss notification |
+| **Tap → Expand → AI Assist** | Needs thought | Reply to email, respond to Slack |
+
+### Card Flow for Complex Tasks
+1. **Initial** - Minimal card in stack (title, source icon, priority)
+2. **Expanded** - Full context shown on tap
+3. **AI Prompt** - "Want me to draft a reply?"
+4. **AI Draft** - Editable AI-generated response
+5. **Action** - Send/Confirm button
+
+### Key Principle
+**User always stays in control.** AI offers to help, never auto-sends.
+
+### Updated PRD List (10 PRDs)
+01. Core Swipe ✅
+02. Authentication
+03. Task Data Model
+04. Notion Sync
+05. Card UI System (Swipe + Expanded + AI UI)
+06. Gmail Integration
+07. Slack Integration
+08. AI Drafting
+09. Learning Mode
+10. Polish
+
+### Files Changed
+- docs/PRODUCT_BRIEF.md (updated with interaction patterns)
+- CLAUDE.md (updated PRD list)
+- progress.txt (this entry)
+
+---

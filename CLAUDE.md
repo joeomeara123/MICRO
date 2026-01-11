@@ -49,11 +49,14 @@ Product Brief → PRDs → User Stories → Success Criteria → Build → Test 
 |---|-----|--------|-------------|
 | 01 | Core Swipe | ✅ Done | Gesture handling, animations, haptics |
 | 02 | Authentication | 🔲 Next | Google Sign-In + Supabase session |
-| 03 | Task Data Model | 🔲 Pending | Supabase schema + types |
+| 03 | Task Data Model | 🔲 Pending | Supabase schema + polymorphic types |
 | 04 | Notion Sync | 🔲 Pending | Pull tasks, update status |
-| 05 | Task Cards | 🔲 Pending | Polymorphic card UI + actions |
-| 06 | Learning Mode | 🔲 Pending | Content cards + mode toggle |
-| 07 | Polish | 🔲 Pending | Splash, transitions, refinements |
+| 05 | Card UI System | 🔲 Pending | Swipe cards + Expanded view + AI assist UI |
+| 06 | Gmail Integration | 🔲 Pending | Read emails, AI drafts, send replies |
+| 07 | Slack Integration | 🔲 Pending | Read messages, AI drafts, send responses |
+| 08 | AI Drafting | 🔲 Pending | Claude/OpenAI integration for responses |
+| 09 | Learning Mode | 🔲 Pending | Content cards + mode toggle |
+| 10 | Polish | 🔲 Pending | Splash, transitions, refinements |
 
 ### Completed
 - [x] Project planning and architecture design

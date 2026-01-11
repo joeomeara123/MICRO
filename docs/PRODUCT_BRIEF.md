@@ -40,26 +40,93 @@ Same dopamine hit. Actually getting things done.
 
 ---
 
-## Core Concept: Polymorphic Task Cards
+## Core Concept: Interaction Complexity Matching
 
-Tasks are **context-dependent**. Each task type defines its own swipe actions and card UI.
+**Match the interaction to the task complexity.**
 
-### Task Type Examples
+### Two Interaction Patterns
 
-| Task Type | Source | Swipe Right | Swipe Left | Card Content |
-|-----------|--------|-------------|------------|--------------|
-| **Finance Reminder** | Notion | Mark done | Snooze | "Upload VAT by Friday" |
-| **Email Draft** | Gmail | Send drafted reply | Archive | Subject + AI-drafted reply |
-| **Candidate Review** | Notion/ATS | Schedule interview | Reject | Name + CV summary |
-| **Slack Link** | Slack | Save/bookmark | Dismiss | Link preview + context |
-| **Content** | X/Twitter | Save to read later | Skip | Tweet/thread preview |
+| Pattern | When to Use | Example Tasks |
+|---------|-------------|---------------|
+| **Swipe** | Binary decisions (yes/no) | Approve contract, dismiss notification, mark done |
+| **Tap → Expand → AI Assist** | Needs thought or composition | Reply to email, respond to Slack, review candidate |
+
+### Swipe Tasks (Binary)
+
+Simple yes/no decisions that don't require reading or composing:
+
+| Task Type | Source | Swipe Right | Swipe Left |
+|-----------|--------|-------------|------------|
+| **Finance Reminder** | Notion | Mark done | Snooze |
+| **Approval Request** | Notion | Approve | Reject |
+| **Content Card** | X/Twitter | Save for later | Skip |
+
+### Expand Tasks (AI-Assisted)
+
+Tasks requiring context, thought, or composition:
+
+```
+┌─────────────────────────────┐
+│  📧 Email from Sarah        │  ← Card in stack (minimal)
+│  "Q3 Budget Review"         │
+└─────────────────────────────┘
+            │ TAP
+            ▼
+┌─────────────────────────────────────────────┐
+│  📧 Email from Sarah                        │
+│  ─────────────────────────────────          │
+│  "Hi Joe, can you review the Q3 budget      │
+│   and let me know your thoughts on the      │
+│   marketing allocation? Thanks!"            │
+│  ─────────────────────────────────          │
+│                                             │
+│  ┌─────────────────────────────────────┐   │
+│  │ 💬 "Want me to draft a reply?"      │   │
+│  │                                      │   │
+│  │  [Yes, draft it]  [I'll type myself] │   │
+│  └─────────────────────────────────────┘   │
+└─────────────────────────────────────────────┘
+            │ "Yes, draft it"
+            ▼
+┌─────────────────────────────────────────────┐
+│  📧 Reply to Sarah                          │
+│  ─────────────────────────────────          │
+│  "Hi Sarah,                                 │
+│                                             │
+│   I've reviewed the Q3 budget. The          │
+│   marketing allocation looks good overall,  │
+│   though we might want to shift 5% from     │
+│   paid ads to content..."                   │
+│                                             │
+│  [Edit]                    [Send ✓]         │
+└─────────────────────────────────────────────┘
+```
+
+### Expand Task Examples
+
+| Task Type | Source | Tap Action | AI Prompt | Final Actions |
+|-----------|--------|------------|-----------|---------------|
+| **Email Reply** | Gmail | Show full email | "Want me to draft a reply?" | Edit / Send |
+| **Slack Message** | Slack | Show thread context | "Want me to draft a response?" | Edit / Send |
+| **Candidate Review** | Notion | Show CV summary | "Schedule interview?" | Pick time / Reject |
+| **Document Review** | Notion | Show document | "Summarize key points?" | Approve / Request changes |
 
 ### Card States
 
-Cards can have **intermediate states** before final action:
-1. **Initial** → View summary
-2. **Expanded** → Tap for details (CV, email thread, full article)
-3. **Action** → Swipe to execute
+Cards progress through states based on interaction:
+
+```
+INITIAL (in stack)           EXPANDED (tapped)              AI ASSIST                    ACTION
+┌──────────────┐            ┌──────────────────┐          ┌──────────────────┐         ┌──────────────┐
+│ Title        │  ──TAP──▶  │ Full content     │  ──AI──▶ │ AI draft shown   │  ──OK──▶│ Send/Confirm │
+│ Source icon  │            │ Context          │          │ Edit option      │         │              │
+│ Priority     │            │ AI prompt button │          │ Confirm/reject   │         │              │
+└──────────────┘            └──────────────────┘          └──────────────────┘         └──────────────┘
+       │                                                                                      │
+       └──────────────────────────SWIPE (binary tasks only)───────────────────────────────────┘
+```
+
+**Key Principle**: User always stays in control. AI offers to help, never auto-sends.
 
 ---
 
@@ -166,16 +233,18 @@ Toggle between modes via bottom tab or swipe gesture.
 - [x] Core swipe UI with animations
 - [ ] Google Sign-In authentication
 - [ ] Notion task sync (read + update status)
+- [ ] Gmail integration (read emails, send AI-drafted replies)
+- [ ] Slack integration (read messages, send AI-drafted responses)
+- [ ] AI-drafted responses (Claude/OpenAI for email/Slack)
 - [ ] Task cards with priority badges
+- [ ] Expanded card view with AI assist prompts
 - [ ] Learning mode with manual content add
 - [ ] Haptic feedback
 - [ ] Animated splash screen
 
 ### Out of Scope (Phase 1)
-- Email integration (Phase 2)
-- Slack integration (Phase 2)
-- AI-drafted responses (Phase 2)
 - Push notifications (Phase 2)
+- Calendar integration (Phase 2)
 - Offline mode (Phase 3)
 - App Store submission (Phase 3)
 
@@ -189,11 +258,14 @@ The MVP will be built through these PRDs (in priority order):
 |---|-----|-------------|--------------|
 | 01 | Core Swipe | Gesture handling, animations, haptics | None |
 | 02 | Authentication | Google Sign-In + Supabase session | None |
-| 03 | Task Data Model | Supabase schema + types | 02 |
+| 03 | Task Data Model | Supabase schema + polymorphic types | 02 |
 | 04 | Notion Sync | Pull tasks, update status | 02, 03 |
-| 05 | Task Cards | Polymorphic card UI + actions | 01, 03 |
-| 06 | Learning Mode | Content cards + mode toggle | 01, 05 |
-| 07 | Polish | Splash, transitions, refinements | All |
+| 05 | Card UI System | Swipe cards + Expanded view + AI assist UI | 01, 03 |
+| 06 | Gmail Integration | Read emails, AI drafts, send replies | 02, 05 |
+| 07 | Slack Integration | Read messages, AI drafts, send responses | 02, 05 |
+| 08 | AI Drafting | Claude/OpenAI integration for responses | 06, 07 |
+| 09 | Learning Mode | Content cards + mode toggle | 05 |
+| 10 | Polish | Splash, transitions, refinements | All |
 
 ---
 
