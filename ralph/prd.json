@@ -100,8 +100,8 @@
         "Typecheck passes: npx tsc --noEmit"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": "Core table for the app. Uses hybrid pattern: typed columns for common fields, JSONB for source-specific metadata."
+      "passes": true,
+      "notes": "Core table for the app. Uses hybrid pattern: typed columns for common fields, JSONB for source-specific metadata. Reuses update_updated_at_column() trigger function. Partial index excludes soft-deleted tasks for efficient feed queries."
     },
     {
       "id": "US-006",

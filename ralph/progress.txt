@@ -13,6 +13,8 @@ Branch: ralph/03-task-data-model
 - RLS pattern: `auth.uid() = user_id`
 - Reusable `update_updated_at_column()` trigger function defined in connected_apps migration - use it for other tables
 - Server-side-only tables: enable RLS with NO policies = clients cannot access, only Edge Functions with service_role key can
+- Partial indexes with WHERE clause (e.g., `WHERE deleted_at IS NULL`) are more efficient for queries that always filter by that condition
+- Soft delete pattern: use `deleted_at TIMESTAMPTZ` column, filter with `WHERE deleted_at IS NULL` in queries
 
 ---
 
@@ -117,6 +119,34 @@ PRD 03: Task Data Model
 - This pattern is used for any server-side-only data (tokens, secrets, etc.)
 - The update_updated_at_column() function is already defined in connected_apps migration - just reference it
 - Comments in SQL help document security decisions for future developers
+
+**Note:** Migration must be applied via Supabase dashboard (US-006) before table is visible.
+
+---
+
+## 2026-01-11 19:35 - US-005: Create tasks Table
+
+**What was implemented:**
+- Created migration file for tasks table (core table for the app)
+- UUID primary key with auto-generation via gen_random_uuid()
+- Foreign key to auth.users with ON DELETE CASCADE
+- Typed columns using enums from US-002: source (task_source), priority_level (task_priority), status (task_status)
+- JSONB metadata column for source-specific flexibility
+- Lifecycle columns: snoozed_until, actioned_at, deleted_at (soft delete pattern)
+- Two strategic indexes:
+  - idx_tasks_user_feed: partial index on (user_id, status) WHERE deleted_at IS NULL for efficient feed queries
+  - idx_tasks_deduplication: on (user_id, source, source_id) to prevent duplicate imports
+- Reuses update_updated_at_column() trigger from connected_apps migration
+- RLS enabled with 4 policies (SELECT/INSERT/UPDATE/DELETE for own rows)
+
+**Files changed:**
+- supabase/migrations/20260111000004_create_tasks.sql (new)
+
+**Learnings for future iterations:**
+- Partial indexes with WHERE clauses are more efficient for queries that always filter by that condition
+- Soft delete pattern (deleted_at IS NULL) keeps data for audit while filtering from active queries
+- The hybrid pattern (typed columns + JSONB metadata) provides both type safety and flexibility
+- Each source type (Notion, Email, Slack) will store its specific data in the metadata JSONB column
 
 **Note:** Migration must be applied via Supabase dashboard (US-006) before table is visible.
 
