@@ -179,8 +179,8 @@
         "Typecheck passes: npx tsc --noEmit"
       ],
       "priority": 9,
-      "passes": false,
-      "notes": "Encapsulates all task database operations. Components call service functions, not Supabase directly."
+      "passes": true,
+      "notes": "Service layer encapsulates all task CRUD operations. Uses untyped Supabase client until US-007 generates proper types."
     },
     {
       "id": "US-010",

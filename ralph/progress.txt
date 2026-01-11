@@ -9,6 +9,8 @@ Branch: ralph/03-task-data-model
 - Migrations go in supabase/migrations/ with timestamp prefix (YYYYMMDDHHMMSS_description.sql)
 - Auth context is in contexts/AuthContext.tsx
 - Task/CardTask types are in types/task.ts, database types in types/database.ts
+- Task service layer in services/tasks/ - all database ops go through service functions
+- Service functions return TaskServiceResult<T> with {data, error} pattern
 - Use `npx tsc --noEmit` for typecheck
 - RLS pattern: `auth.uid() = user_id`
 - Reusable `update_updated_at_column()` trigger function defined in connected_apps migration - use it for other tables
@@ -207,5 +209,36 @@ supabase db push
 - CardTask type adds UI-specific fields (brand, owner) not in database
 - Type guards enable discriminated unions for source-specific metadata handling
 - Re-exporting types maintains backward compatibility with existing imports
+
+---
+
+## 2026-01-11 19:55 - US-009: Create Task Service Layer
+
+**What was implemented:**
+- Created services/tasks/ folder
+- Created services/tasks/task-service.ts with CRUD operations
+- TaskServiceResult<T> type for consistent error handling
+- FetchTasksOptions interface with filtering options
+- Functions: fetchUserTasks, updateTaskStatus, snoozeTask, createTask, deleteTask
+- All functions return {data, error} pattern
+- Console logging at entry/exit points for debugging
+- Uses untyped Supabase client (types will be generated in US-007)
+- Created services/tasks/index.ts for clean exports
+- Created services/tasks/CLAUDE.md with usage documentation
+- Updated types/database.ts with Json type for JSONB columns
+
+**Files changed:**
+- services/tasks/task-service.ts (new) - Task CRUD service layer
+- services/tasks/index.ts (new) - Public exports
+- services/tasks/CLAUDE.md (new) - Service documentation
+- services/supabase.ts (modified) - Removed Database generic until types generated
+- types/database.ts (modified) - Added Json type, Relationships, Views/Functions/CompositeTypes
+
+**Learnings for future iterations:**
+- Supabase client with Database generic requires exact type match
+- Pragmatic solution: use untyped client, add types after US-007 generates them
+- TaskServiceResult pattern makes error handling consistent across app
+- Console logging with [TaskService] prefix aids debugging
+- Import task service via: `import { fetchUserTasks, updateTaskStatus } from '@/services/tasks'`
 
 ---
