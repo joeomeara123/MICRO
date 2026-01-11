@@ -1,0 +1,141 @@
+{
+  "project": "micro-app",
+  "branchName": "ralph/02-authentication",
+  "description": "Implement Google Sign-In authentication with Supabase, including Gmail scope access and session persistence",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Create Supabase Project",
+      "description": "As a developer, I need a Supabase project configured so that I have a backend for authentication and data storage.",
+      "acceptanceCriteria": [
+        "Supabase project created at supabase.com",
+        "Project URL and anon key obtained",
+        ".env.local file created with EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY",
+        ".env.local added to .gitignore",
+        ".env.example created with placeholder values for documentation",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Manual step - requires creating project at supabase.com"
+    },
+    {
+      "id": "US-002",
+      "title": "Create Google OAuth Credentials",
+      "description": "As a developer, I need Google Cloud OAuth credentials so that users can sign in with Google.",
+      "acceptanceCriteria": [
+        "Google Cloud project created or existing project used",
+        "OAuth consent screen configured with app name and scopes",
+        "iOS OAuth client ID created with correct bundle ID",
+        "Web OAuth client ID created (required for expo-auth-session)",
+        "Client IDs added to .env.local: EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID, EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID",
+        ".env.example updated with Google credential placeholders",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "Manual step - requires Google Cloud Console access"
+    },
+    {
+      "id": "US-003",
+      "title": "Initialize Supabase Client",
+      "description": "As a developer, I need a configured Supabase client so that the app can communicate with the backend.",
+      "acceptanceCriteria": [
+        "services/supabase.ts file created",
+        "Supabase client initialized with URL and anon key from environment",
+        "AsyncStorage configured for session persistence",
+        "autoRefreshToken and persistSession options enabled",
+        "TypeScript types exported for Database (placeholder initially)",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Create Auth Context and Hook",
+      "description": "As a developer, I need an auth context so that authentication state is accessible throughout the app.",
+      "acceptanceCriteria": [
+        "contexts/AuthContext.tsx file created",
+        "Context provides: user, session, isLoading, signIn, signOut",
+        "hooks/useAuth.ts created as convenience hook",
+        "Context listens to Supabase auth state changes via onAuthStateChange",
+        "Loading state is true until initial session check completes",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Implement Google Sign-In Flow",
+      "description": "As a user, I want to sign in with my Google account so that I can access the app.",
+      "acceptanceCriteria": [
+        "services/auth/google-auth.ts file created",
+        "Uses expo-auth-session Google provider",
+        "Requests scopes: openid, email, profile, gmail.readonly, gmail.send, gmail.modify",
+        "Requests offline access (access_type: offline) for refresh token",
+        "On success, creates or updates user in Supabase Auth using signInWithIdToken",
+        "Google access/refresh tokens stored in Supabase user metadata",
+        "Returns Supabase session to app",
+        "Verify on device: Tapping Continue with Google opens Google OAuth flow",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "Core authentication logic"
+    },
+    {
+      "id": "US-006",
+      "title": "Update Sign-In Screen with Real Auth",
+      "description": "As a user, I want the sign-in button to actually authenticate me.",
+      "acceptanceCriteria": [
+        "app/sign-in.tsx updated to use useGoogleAuth hook",
+        "Loading state shown while auth is in progress",
+        "Error handling with user-friendly message on failure",
+        "On success, navigation handled by auth state change (not manual redirect)",
+        "Verify on device: Sign in completes and user proceeds to next screen",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Implement Protected Routes",
+      "description": "As a user, I should be redirected to sign-in if not authenticated, and to feed if authenticated.",
+      "acceptanceCriteria": [
+        "app/_layout.tsx wrapped with AuthProvider",
+        "Root layout checks auth state before rendering routes",
+        "Unauthenticated users redirected to /sign-in",
+        "Authenticated first-time users go to /onboarding (check AsyncStorage flag)",
+        "Authenticated returning users go to /(tabs) feed",
+        "Splash or loading screen shown during auth check",
+        "Verify on device: Fresh app launch shows sign-in. After sign-in shows onboarding or feed.",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Implement Sign Out",
+      "description": "As a user, I want to sign out so that I can switch accounts or secure my session.",
+      "acceptanceCriteria": [
+        "Sign out button added to settings or profile area",
+        "Calling signOut clears Supabase session",
+        "User redirected to sign-in screen after sign out",
+        "Google tokens cleared from user metadata",
+        "Verify on device: Tapping sign out returns to sign-in screen",
+        "Typecheck passes"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
