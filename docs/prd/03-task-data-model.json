@@ -1,0 +1,208 @@
+{
+  "project": "micro-app",
+  "branchName": "ralph/03-task-data-model",
+  "description": "Create Supabase database schema for tasks, connected apps, and OAuth tokens with TypeScript types and service layer. Establishes the data foundation for all subsequent integrations.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Create Supabase Local Development Setup",
+      "description": "As a developer, I need the Supabase CLI configured locally so that I can create and test database migrations before deploying.",
+      "acceptanceCriteria": [
+        "Supabase CLI installed globally (npm install -g supabase)",
+        "supabase/ folder created at project root",
+        "supabase init run to create config structure",
+        "supabase/migrations/ folder exists for SQL migrations",
+        "supabase/config.toml configured with project settings",
+        ".gitignore updated to exclude supabase/.temp/ if present",
+        "README section added to supabase/ explaining migration workflow",
+        "Typecheck passes: npx tsc --noEmit"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Foundation for all database work. Run: npm install -g supabase && supabase init"
+    },
+    {
+      "id": "US-002",
+      "title": "Create Database Enums",
+      "description": "As a developer, I need PostgreSQL enums defined so that columns have constrained, type-safe values.",
+      "acceptanceCriteria": [
+        "Migration file created: supabase/migrations/20260111000001_create_enums.sql",
+        "integration_provider enum: google, notion, slack, linear, jira",
+        "connection_status enum: active, token_expired, refresh_failed, revoked, disconnected",
+        "task_source enum: notion, email, slack, ai_suggestion, manual",
+        "task_priority enum: high, medium, low",
+        "task_status enum: pending, approved, dismissed, snoozed",
+        "Migration can be applied without errors",
+        "Enums visible in Supabase dashboard under Database → Types",
+        "Typecheck passes: npx tsc --noEmit"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "Must be created before tables that use these enums. Enums provide type safety at database level."
+    },
+    {
+      "id": "US-003",
+      "title": "Create connected_apps Table",
+      "description": "As a system, I need to track which OAuth integrations each user has connected so that I know which services to sync.",
+      "acceptanceCriteria": [
+        "Migration file created: supabase/migrations/20260111000002_create_connected_apps.sql",
+        "Table connected_apps created with columns: id, user_id, provider, status, provider_account_id, provider_account_name, provider_account_email, granted_scopes, connected_at, last_sync_at, created_at, updated_at",
+        "Primary key: id (UUID, auto-generated)",
+        "Foreign key: user_id references auth.users(id) with ON DELETE CASCADE",
+        "Unique constraint on (user_id, provider)",
+        "Trigger created for auto-updating updated_at on row changes",
+        "RLS enabled on table",
+        "RLS policy: users can SELECT/INSERT/UPDATE/DELETE only their own rows",
+        "Migration applied successfully",
+        "Table visible in Supabase dashboard",
+        "Typecheck passes: npx tsc --noEmit"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "Tracks integrations like Google, Notion, Slack. Each user can have one connection per provider."
+    },
+    {
+      "id": "US-004",
+      "title": "Create oauth_tokens Table (Server-Side Only)",
+      "description": "As a system, I need to securely store OAuth tokens so that Edge Functions can make API calls on behalf of users.",
+      "acceptanceCriteria": [
+        "Migration file created: supabase/migrations/20260111000003_create_oauth_tokens.sql",
+        "Table oauth_tokens created with columns: id, connected_app_id, access_token, refresh_token, token_type, expires_at, created_at, updated_at",
+        "Primary key: id (UUID, auto-generated)",
+        "Foreign key: connected_app_id references connected_apps(id) with ON DELETE CASCADE",
+        "Index created on connected_app_id for fast lookups",
+        "RLS enabled on table",
+        "NO RLS policies created - table inaccessible from client",
+        "Comment added explaining server-side-only access pattern",
+        "Migration applied successfully",
+        "Verify: SELECT * FROM oauth_tokens from client returns empty/error",
+        "Typecheck passes: npx tsc --noEmit"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": "CRITICAL SECURITY: No RLS policies = no client access. Only Edge Functions with service_role key can read/write."
+    },
+    {
+      "id": "US-005",
+      "title": "Create tasks Table",
+      "description": "As a user, I need my tasks stored in the database so that swipe actions persist and I see the same tasks across devices.",
+      "acceptanceCriteria": [
+        "Migration file created: supabase/migrations/20260111000004_create_tasks.sql",
+        "Table tasks created with typed columns: id, user_id, source, source_id, title, description, category, priority_level, status, due_date",
+        "JSONB metadata column for source-specific data",
+        "Lifecycle columns: snoozed_until, actioned_at, deleted_at (soft delete)",
+        "Timestamp columns: created_at, updated_at with auto-update trigger",
+        "Foreign key: user_id references auth.users(id) with ON DELETE CASCADE",
+        "Index on (user_id, status) WHERE deleted_at IS NULL for feed queries",
+        "Index on (user_id, source, source_id) for deduplication",
+        "RLS enabled with policy: users can only access their own tasks",
+        "Migration applied successfully",
+        "Typecheck passes: npx tsc --noEmit"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "Core table for the app. Uses hybrid pattern: typed columns for common fields, JSONB for source-specific metadata."
+    },
+    {
+      "id": "US-006",
+      "title": "Apply Migrations to Supabase",
+      "description": "As a developer, I need the migrations applied to the remote Supabase project so that the tables exist in production.",
+      "acceptanceCriteria": [
+        "All migration files reviewed for correctness",
+        "Migrations applied to Supabase via dashboard SQL editor OR supabase db push",
+        "All 5 enums visible in Database → Types",
+        "All 3 tables visible in Database → Tables: connected_apps, oauth_tokens, tasks",
+        "RLS enabled indicator shows on all 3 tables",
+        "Test: SELECT * FROM tasks returns empty result (not error)",
+        "Test: Insert and select own task as authenticated user works",
+        "Test: SELECT * FROM oauth_tokens from client returns empty (RLS blocks)",
+        "Typecheck passes: npx tsc --noEmit"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": "Manual step - apply via Supabase dashboard SQL editor. Verify RLS is working correctly."
+    },
+    {
+      "id": "US-007",
+      "title": "Generate TypeScript Types from Schema",
+      "description": "As a developer, I need TypeScript types generated from the database schema so that I have compile-time type safety for all queries.",
+      "acceptanceCriteria": [
+        "Supabase CLI linked to project: supabase link --project-ref <project-id>",
+        "Types generated: supabase gen types typescript --linked > types/database.ts",
+        "types/database.ts file created with all table types",
+        "Each table has Row, Insert, and Update type variants",
+        "Enum types are generated as TypeScript string literal unions",
+        "services/supabase.ts updated to import and use Database type",
+        "Supabase client is typed: createClient<Database>(...)",
+        "Typecheck passes: npx tsc --noEmit"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": "Generated types provide autocomplete and type checking for all database operations."
+    },
+    {
+      "id": "US-008",
+      "title": "Create Task TypeScript Interface with Metadata Types",
+      "description": "As a developer, I need a Task interface that extends the database types with source-specific metadata for type-safe handling in components.",
+      "acceptanceCriteria": [
+        "types/task.ts file created",
+        "TaskRow, TaskInsert, TaskUpdate types exported from database types",
+        "TaskSource, TaskStatus, TaskPriority enum types exported",
+        "NotionTaskMetadata interface: page_id, database_id, properties, url",
+        "EmailTaskMetadata interface: message_id, thread_id, from, to, subject, snippet",
+        "SlackTaskMetadata interface: channel_id, channel_name, message_ts, thread_ts, sender_id",
+        "TaskMetadata union type combining all metadata interfaces",
+        "Task interface extending TaskRow with typed metadata",
+        "TaskCard.tsx updated to import Task from types/task.ts",
+        "No functionality changes to TaskCard - just import path update",
+        "Typecheck passes: npx tsc --noEmit"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": "Provides type safety for source-specific metadata while keeping flexibility."
+    },
+    {
+      "id": "US-009",
+      "title": "Create Task Service Layer",
+      "description": "As a developer, I need a service layer that encapsulates all task database operations so that components don't directly call Supabase.",
+      "acceptanceCriteria": [
+        "services/tasks/ folder created",
+        "services/tasks/task-service.ts file created",
+        "TaskServiceResult<T> type with data and error fields",
+        "FetchTasksOptions interface with status, source, limit",
+        "fetchUserTasks(userId, options?) function implemented",
+        "updateTaskStatus(taskId, status) function implemented",
+        "snoozeTask(taskId, until) function implemented",
+        "createTask(task) function implemented",
+        "All functions return TaskServiceResult with proper typing",
+        "Console logging added for debugging",
+        "Typecheck passes: npx tsc --noEmit"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": "Encapsulates all task database operations. Components call service functions, not Supabase directly."
+    },
+    {
+      "id": "US-010",
+      "title": "Connect Feed to Database with Sample Fallback",
+      "description": "As a user, I want my feed to show real tasks from the database, with sample tasks as fallback when the database is empty.",
+      "acceptanceCriteria": [
+        "app/(tabs)/index.tsx imports fetchUserTasks and updateTaskStatus from task service",
+        "useAuth hook used to get current user ID",
+        "useEffect fetches tasks on mount when user is available",
+        "Loading state shown while fetching (ActivityIndicator or skeleton)",
+        "If tasks returned from database: display database tasks",
+        "If no tasks (empty array): display SAMPLE_TASKS as fallback",
+        "If fetch error: show error message with option to use sample data",
+        "handleApprove calls updateTaskStatus(taskId, 'approved')",
+        "handleDismiss calls updateTaskStatus(taskId, 'dismissed')",
+        "Console logs confirm database updates",
+        "Verify on device: App loads and shows tasks or sample fallback",
+        "Typecheck passes: npx tsc --noEmit"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Final story - connects everything together. Sample fallback ensures app works for demos even with empty database."
+    }
+  ]
+}
