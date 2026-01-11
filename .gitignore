@@ -42,3 +42,5 @@ yarn-error.*
 
 # Claude Code context (auto-generated)
 .claude/
+**/CLAUDE.md
+!CLAUDE.md
