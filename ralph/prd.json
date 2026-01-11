@@ -158,8 +158,8 @@
         "Typecheck passes: npx tsc --noEmit"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": "Provides type safety for source-specific metadata while keeping flexibility."
+      "passes": true,
+      "notes": "Created types/database.ts with manual types matching schema and types/task.ts with source-specific metadata types. Added CardTask for UI compatibility with priority display conversion. TaskCard.tsx now imports from types/task.ts."
     },
     {
       "id": "US-009",

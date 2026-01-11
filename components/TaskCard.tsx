@@ -2,18 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BrandLogo } from './BrandLogo';
+import { CardTask } from '@/types/task';
 
-export interface Task {
-  id: string;
-  title: string;
-  description?: string;
-  category?: string;
-  priority_level?: 'High' | 'Medium' | 'Low';
-  source: 'notion' | 'email' | 'ai_suggestion' | 'manual' | 'twitter' | 'slack' | 'newsletter' | 'article';
-  due_date?: string;
-  owner?: string;
-  brand?: string; // Specific brand for logo (e.g., "Lenny", "Financial Times")
-}
+// Re-export for backward compatibility with existing imports
+export type Task = CardTask;
 
 interface TaskCardProps {
   task: Task;
